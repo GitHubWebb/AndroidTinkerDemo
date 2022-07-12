@@ -1,0 +1,52 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 27
+    buildToolsVersion "27.0.0"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0"
+
+        multiDexEnabled true
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+
+        // BuglyAppId
+        buildConfigField("String", "BuglyAppId", "\"xxxxxx\"")
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation "com.android.support:multidex:1.0.2" // 多dex配置
+
+    // 注释掉原有bugly的仓库
+    // compile 'com.tencent.bugly:crashreport:latest.release'//其中latest.release指代最新版本号，也可以指定明确的版本号，例如1.3.4
+    // 1.5.23 为AndroidX版本
+    api 'com.tencent.bugly:crashreport_upgrade:1.5.0'
+    // 指定tinker依赖版本（注：应用升级1.3.5版本起，不再内置tinker）
+    api 'com.tencent.tinker:tinker-android-lib:1.9.14.22'
+//    api 'com.tencent.tinker:tinker-android-lib:latest.release'
+    implementation 'com.tencent.bugly:nativecrashreport:3.9.1' //其中latest.release指代最新版本号，也可以指定明确的版本号，例如2.2.0
+
+    // 吐司框架：https://github.com/getActivity/ToastUtils
+    api 'com.github.getActivity:ToastUtils:10.3'
+
+}

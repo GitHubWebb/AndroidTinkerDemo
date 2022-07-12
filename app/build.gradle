@@ -1,0 +1,78 @@
+apply plugin: 'com.android.application'
+
+if (tinkerEnable.toBoolean())
+    apply from: "../TinkerSDK/tinker-support.gradle"
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion '29.0.3'
+
+    lintOptions {
+        tasks.lint.enabled = false
+        abortOnError false
+    }
+    dexOptions {
+        dexInProcess true // dx 编译器时作为一个独立的进程或内部JVM Gradle守护进程
+        preDexLibraries true //这可以提高增量构建,但clean构建可能会慢一些
+        javaMaxHeapSize "2g"
+        jumboMode = true    // 修改的是dex中string类型的上限
+
+    }
+
+    defaultConfig {
+        applicationId "com.wwx.androidtinkerdemo"
+        minSdkVersion 15
+        targetSdkVersion 30
+        ndk {
+            abiFilters 'armeabi','arm64-v8a'
+        }
+
+        multiDexEnabled true
+
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+
+if (tinkerEnable.toBoolean()) {
+
+// 解决 Tinker public.txt : ERROR： failed reading stable ID file.
+    android.applicationVariants.all { variant ->
+/**
+ * task type, you want to bak
+ */
+        def taskName = variant.name
+        def path = "${buildDir}/intermediates/tinker_intermediates/public.txt"
+
+        tasks.all {
+            if ("process${taskName.capitalize()}Resources".equalsIgnoreCase(it.name)) {
+                it.doFirst {
+                    createFile(path)
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:2.0.1'
+
+    implementation project(':TinkerSDK')
+
+}
